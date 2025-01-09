@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>College Chatbot</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333333;
+        }
+
+        #chat-container {
+            background-color: #ffffff;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            overflow-y: scroll;
+            max-height: 300px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+        }
+
+        .user-message {
+            text-align: right;
+        }
+
+        .chatbot-message {
+            text-align: left;
+        }
+
+        .message-content {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+
+        .user-message .message-content {
+            background-color: #e2f0cb;
+        }
+
+        .chatbot-message .message-content {
+            background-color: #d2d2d2;
+        }
+
+        #user-input-form {
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .send-button {
+            width: 15%;
+            padding: 10px;
+            background-color: #4267B2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .fa-paper-plane {
+            font-size: 20px;
+        }
+
+        .fa-paper-plane:hover {
+            background-color: #29487D;
+        }
+
+        .box {
+            background-color: #ffffff;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            overflow-y: scroll;
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>College Chatbot</h1>
+        <div id="chat-container">
+            <div class="box">
+                <div class="message chatbot-message">
+                    <div class="message-content">
+                        <div class="message-text">Hi! I'm a chatbot. How can I assist you today?</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form id="user-input-form">
+            <div class="box">
+                <input type="text" id="user-input" placeholder="Type your message..." autofocus autocomplete="off">
+                <button type="submit" class="send-button">Send</button>
+            </div>
+        </form>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('form').on('submit', function(event) {
+                event.preventDefault();
+                var user_input = $('#user-input').val();
+                if (user_input.trim() !== '') {
+                    $('#user-input').val('');
+                    appendUserMessage(user_input);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/chat',
+                        data: { user_input: user_input },
+                        success: function(response) {
+                            appendChatbotMessage(response.response);  // If backend returns JSON with `response` field
+                        },
+                        error: function(xhr, status, error) {
+                            console.log("Error: ", error);  // This will show any error during AJAX request
+                        },
+                        dataType: 'json'  // Ensure the response is treated as JSON
+                    });
+                }
+            });
+
+            function appendUserMessage(message) {
+                var messageElement = $('<div class="message user-message"></div>').text(message);
+                $('#chat-container').append(messageElement);
+                scrollChatToBottom();
+            }
+
+            function appendChatbotMessage(message) {
+                var messageElement = $('<div class="message chatbot-message"></div>').text(message);
+                $('#chat-container').append(messageElement);
+                scrollChatToBottom();
+            }
+
+            function scrollChatToBottom() {
+                $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
+            }
+        });
+    </script>
+</body>
+</html>
