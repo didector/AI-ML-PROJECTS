@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from urllib.parse import quote
 import pickle
 import json
 import random
