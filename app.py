@@ -1,9 +1,7 @@
 import streamlit as st
-from urllib.parse import quote
 import pickle
 import json
 import random
-
 
 # Load the trained model and vectorizer
 with open('model/chatbot_model.pkl', 'rb') as f:
@@ -17,25 +15,26 @@ with open('dataset/intents1.json', 'r') as f:
     intents = json.load(f)
 
 def chatbot_response(user_input):
+    # Preprocess user input and predict the intent
     input_text = vectorizer.transform([user_input])
     predicted_intent = best_model.predict(input_text)[0]
 
+    # Find the corresponding response
     for intent in intents['intents']:
         if intent['tag'] == predicted_intent:
             response = random.choice(intent['responses'])
-            break
+            return response
 
-    return response
+    return "I'm sorry, I don't understand your question."
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+# Streamlit App UI
+st.title("College Admission Chatbot")
+st.write("Ask any question related to admissions, placements, or facilities.")
 
-@app.route('/chat', methods=['POST'])
-def chat():
-    user_input = request.form['user_input']
+# User input field
+user_input = st.text_input("You:", "")
+
+# Generate response when input is provided
+if user_input:
     response = chatbot_response(user_input)
-    return jsonify({'response': response})  # Return JSON response
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    st.write(f"Chatbot: {response}")
