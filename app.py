@@ -1,10 +1,9 @@
-from flask import Flask, render_template, request
+import streamlit as st
 from urllib.parse import quote
 import pickle
 import json
 import random
 
-app = Flask(__name__)
 
 # Load the trained model and vectorizer
 with open('model/chatbot_model.pkl', 'rb') as f:
